@@ -104,7 +104,7 @@ export function Navbar({ isAdmin = false }: { isAdmin?: boolean }) {
 
       {/* Mobile bottom navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t-2 border-[#C9A84C]/20">
-        <div className="grid grid-cols-4 h-16">
+        <div className={`grid h-16 ${isAdmin ? "grid-cols-5" : "grid-cols-4"}`}>
           {navLinks.map(({ href, label, icon: Icon }) => {
             const active = pathname === href || (href !== "/" && pathname.startsWith(href));
             return (
@@ -118,6 +118,15 @@ export function Navbar({ isAdmin = false }: { isAdmin?: boolean }) {
               </Link>
             );
           })}
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className={`flex flex-col items-center justify-center gap-1 transition-colors ${pathname.startsWith("/admin") ? "text-[#C9A84C]" : "text-[#666666]"}`}
+            >
+              <LayoutDashboard className="w-5 h-5" />
+              <span className="text-[10px] font-medium">Admin</span>
+            </Link>
+          )}
           <button
             onClick={() => setCartOpen(true)}
             className="relative flex flex-col items-center justify-center gap-1 text-[#666666]"
