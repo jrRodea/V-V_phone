@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShoppingBag, Heart, Home, BookOpen, User } from "lucide-react";
+import { ShoppingBag, Heart, Home, BookOpen, LayoutDashboard } from "lucide-react";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { useCartStore } from "@/lib/cart-store";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { useState } from "react";
 
-export function Navbar() {
+export function Navbar({ isAdmin = false }: { isAdmin?: boolean }) {
   const pathname = usePathname();
   const items = useCartStore((s) => s.items);
   const [cartOpen, setCartOpen] = useState(false);
@@ -35,6 +35,12 @@ export function Navbar() {
             <Link href="/catalogo" className={`text-sm font-medium transition-colors ${pathname.startsWith("/catalogo") ? "text-[#C9A84C]" : "text-[#666666] hover:text-[#111111]"}`}>
               Catálogo
             </Link>
+            {isAdmin && (
+              <Link href="/admin" className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${pathname.startsWith("/admin") ? "text-[#C9A84C]" : "text-[#666666] hover:text-[#111111]"}`}>
+                <LayoutDashboard className="w-4 h-4" />
+                Admin
+              </Link>
+            )}
           </nav>
 
           <div className="flex items-center gap-4">
