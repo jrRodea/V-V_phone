@@ -50,23 +50,39 @@ export function AdminPhoneList({ phones: initial }: { phones: Phone[] }) {
             </tr>
           </thead>
           <tbody>
-            {phones.map((phone) => (
-              <tr key={phone.id} className="border-b border-[#E5E5E5] last:border-0 hover:bg-[#F8F8F8]/50">
+            {phones.map((phone) => {
+              const unavailable = !phone.is_available;
+              return (
+              <tr key={phone.id} className={`border-b border-[#E5E5E5] last:border-0 transition-colors ${unavailable ? "bg-gray-50 opacity-60" : "hover:bg-[#F8F8F8]/50"}`}>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-[#F8F8F8] overflow-hidden flex-shrink-0">
+                    <div className="relative w-12 h-12 rounded-lg bg-[#F8F8F8] overflow-hidden flex-shrink-0">
                       {phone.images?.[0] && (
                         <Image src={phone.images[0]} alt={phone.title} width={48} height={48} className="object-cover w-full h-full" />
                       )}
+                      {unavailable && (
+                        <div className="absolute inset-0 bg-gray-400/40 flex items-center justify-center">
+                          <EyeOff className="w-4 h-4 text-white" />
+                        </div>
+                      )}
                     </div>
                     <div>
-                      <p className="font-medium text-[#111111] truncate max-w-[200px]">{phone.title}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-[#111111] truncate max-w-[180px]">{phone.title}</p>
+                        {unavailable && (
+                          <span className="flex-shrink-0 text-[10px] font-semibold bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded-full">
+                            No disponible
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-[#666666]">{phone.brand} · {phone.storage}</p>
                     </div>
                   </div>
                 </td>
                 <td className="px-4 py-3 text-[#666666]">{phone.condition}</td>
-                <td className="px-4 py-3 font-semibold text-[#111111]">{formatPrice(phone.price)}</td>
+                <td className={`px-4 py-3 font-semibold ${unavailable ? "text-gray-400 line-through" : "text-[#111111]"}`}>
+                  {formatPrice(phone.price)}
+                </td>
                 <td className="px-4 py-3 text-center">
                   <button
                     onClick={() => handleToggle(phone.id, "is_available", !phone.is_available)}
@@ -75,15 +91,16 @@ export function AdminPhoneList({ phones: initial }: { phones: Phone[] }) {
                   >
                     {phone.is_available
                       ? <Eye className="w-5 h-5 text-emerald-500" />
-                      : <EyeOff className="w-5 h-5 text-[#666666]" />
+                      : <EyeOff className="w-5 h-5 text-gray-400" />
                     }
                   </button>
                 </td>
                 <td className="px-4 py-3 text-center">
                   <button
                     onClick={() => handleToggle(phone.id, "is_featured", !phone.is_featured)}
+                    disabled={unavailable}
                     aria-label={phone.is_featured ? "Quitar destacado" : "Marcar destacado"}
-                    className="mx-auto flex items-center justify-center"
+                    className="mx-auto flex items-center justify-center disabled:cursor-not-allowed"
                   >
                     <Star className={`w-5 h-5 ${phone.is_featured ? "fill-[#C9A84C] text-[#C9A84C]" : "text-[#E5E5E5]"}`} />
                   </button>
@@ -107,7 +124,8 @@ export function AdminPhoneList({ phones: initial }: { phones: Phone[] }) {
                   </div>
                 </td>
               </tr>
-            ))}
+            );})}
+
           </tbody>
         </table>
 
