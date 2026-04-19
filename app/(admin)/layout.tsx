@@ -22,9 +22,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               Admin
             </span>
           </div>
-          <nav className="flex gap-4 text-sm">
+          <nav className="flex gap-4 text-sm items-center">
             <Link href="/admin" className="text-[#666666] hover:text-[#111111] transition-colors">
               Teléfonos
+            </Link>
+            <Link href="/admin/configuracion" className="text-[#666666] hover:text-[#111111] transition-colors">
+              Configuración
             </Link>
             <Link href="/admin/nuevo" className="bg-[#C9A84C] text-white px-4 py-1.5 rounded-lg hover:bg-[#A6862A] transition-colors font-medium">
               + Nuevo

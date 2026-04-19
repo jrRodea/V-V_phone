@@ -17,11 +17,18 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
   const total = items.reduce((sum, p) => sum + p.price, 0);
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://vvphone.com";
 
-  const handleWhatsApp = () => {
-    const url = generateWhatsAppURL(
-      items.map((phone) => ({ phone })),
-      appUrl
-    );
+  const handleWhatsApp = async () => {
+    // Fetch número desde la DB primero; fallback a env var
+    let number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
+    try {
+      const res = await fetch("/api/admin/settings");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.whatsapp_number) number = data.whatsapp_number;
+      }
+    } catch {}
+
+    const url = generateWhatsAppURL(items.map((phone) => ({ phone })), appUrl, number);
     window.open(url, "_blank");
   };
 

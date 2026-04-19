@@ -78,6 +78,29 @@ ALTER TABLE cart_items ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Sesiones gestionan su propio carrito" ON cart_items
   FOR ALL USING (true) WITH CHECK (true);
 
+-- Tabla: settings
+CREATE TABLE IF NOT EXISTS settings (
+  key        text PRIMARY KEY,
+  value      text NOT NULL,
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Lectura pública de settings" ON settings
+  FOR SELECT USING (true);
+
+CREATE POLICY "Solo admins escriben settings" ON settings
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE clerk_id = auth.uid()::text AND role = 'admin'
+    )
+  );
+
+INSERT INTO settings (key, value) VALUES ('whatsapp_number', '521XXXXXXXXXX')
+ON CONFLICT (key) DO NOTHING;
+
 -- ============================================================
 -- Storage bucket: phone-images
 -- ============================================================

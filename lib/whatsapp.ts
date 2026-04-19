@@ -6,9 +6,10 @@ interface CartItemWithPhone {
 
 export function generateWhatsAppURL(
   items: CartItemWithPhone[],
-  baseUrl: string
+  baseUrl: string,
+  number?: string
 ): string {
-  const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
+  const whatsappNumber = number ?? process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
 
   const lines = items.map((item, i) => {
     const price = new Intl.NumberFormat("es-MX", {
@@ -37,5 +38,5 @@ export function generateWhatsAppURL(
     "¿Están disponibles?",
   ].join("\n");
 
-  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 }
