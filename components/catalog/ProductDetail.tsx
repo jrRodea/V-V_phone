@@ -57,7 +57,8 @@ export function ProductDetail({ phone }: { phone: Phone }) {
                 alt={phone.title}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-contain p-4"
+                className="object-cover"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-[#E5E5E5]">
