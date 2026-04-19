@@ -6,20 +6,33 @@ import Link from "next/link";
 import { Pencil, Trash2, Star, Eye, EyeOff } from "lucide-react";
 import { Phone } from "@/types";
 import { formatPrice } from "@/lib/utils";
-import { supabase } from "@/lib/supabase";
 
 export function AdminPhoneList({ phones: initial }: { phones: Phone[] }) {
   const [phones, setPhones] = useState<Phone[]>(initial);
 
   const handleDelete = async (id: string) => {
     if (!confirm("¿Eliminar este teléfono?")) return;
-    await supabase.from("phones").delete().eq("id", id);
-    setPhones((prev) => prev.filter((p) => p.id !== id));
+
+    const res = await fetch(`/api/admin/phones/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      setPhones((prev) => prev.filter((p) => p.id !== id));
+    } else {
+      alert("Error al eliminar. Intenta de nuevo.");
+    }
   };
 
   const handleToggle = async (id: string, field: "is_featured" | "is_available", value: boolean) => {
-    await supabase.from("phones").update({ [field]: value }).eq("id", id);
-    setPhones((prev) => prev.map((p) => (p.id === id ? { ...p, [field]: value } : p)));
+    const res = await fetch(`/api/admin/phones/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ [field]: value }),
+    });
+
+    if (res.ok) {
+      setPhones((prev) => prev.map((p) => (p.id === id ? { ...p, [field]: value } : p)));
+    } else {
+      alert("Error al actualizar. Intenta de nuevo.");
+    }
   };
 
   return (

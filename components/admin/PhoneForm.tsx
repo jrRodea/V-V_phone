@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Upload, X, GripVertical } from "lucide-react";
 import { Phone } from "@/types";
-import { supabase } from "@/lib/supabase";
 
 const BRANDS = ["Apple", "Samsung", "Xiaomi", "Motorola", "OnePlus", "Google", "Huawei", "Sony", "Otro"];
 const CONDITIONS = ["Nuevo", "Como nuevo", "Bueno", "Aceptable"] as const;
@@ -70,16 +69,17 @@ export function PhoneForm({ phone }: PhoneFormProps) {
     const urls: string[] = [];
 
     for (const file of files) {
-      const ext = file.name.split(".").pop();
-      const name = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const formData = new FormData();
+      formData.append("file", file);
 
-      const { error: uploadError } = await supabase.storage
-        .from("phone-images")
-        .upload(name, file, { cacheControl: "3600", upsert: false });
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-      if (!uploadError) {
-        const { data } = supabase.storage.from("phone-images").getPublicUrl(name);
-        urls.push(data.publicUrl);
+      if (res.ok) {
+        const { url } = await res.json();
+        urls.push(url);
       }
     }
 
@@ -121,13 +121,21 @@ export function PhoneForm({ phone }: PhoneFormProps) {
       is_featured: form.is_featured,
     };
 
-    const { error: dbError } = isEditing
-      ? await supabase.from("phones").update(payload).eq("id", phone!.id)
-      : await supabase.from("phones").insert(payload);
+    const res = isEditing
+      ? await fetch(`/api/admin/phones/${phone!.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+      : await fetch("/api/admin/phones", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
     setSaving(false);
 
-    if (dbError) {
+    if (!res.ok) {
       setError("Ocurrió un error al guardar. Por favor intenta de nuevo.");
       return;
     }
@@ -247,7 +255,7 @@ export function PhoneForm({ phone }: PhoneFormProps) {
 
         <div className="col-span-2">
           <label className="block text-sm font-semibold text-[#111111] mb-1.5">Descripción</label>
-          <textarea value={form.description} onChange={set("description")} rows={3} placeholder="Describe el estado del teléfono, incluye y accesorios..." className={`${fieldClass} resize-none`} />
+          <textarea value={form.description} onChange={set("description")} rows={3} placeholder="Describe el estado del teléfono e incluye accesorios..." className={`${fieldClass} resize-none`} />
         </div>
 
         <div className="col-span-2 flex gap-6">
