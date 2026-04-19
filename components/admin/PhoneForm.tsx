@@ -66,6 +66,7 @@ export function PhoneForm({ phone }: PhoneFormProps) {
     if (!files.length) return;
 
     setUploading(true);
+    setError(null);
     const urls: string[] = [];
 
     for (const file of files) {
@@ -77,9 +78,15 @@ export function PhoneForm({ phone }: PhoneFormProps) {
         body: formData,
       });
 
+      const json = await res.json();
+
       if (res.ok) {
-        const { url } = await res.json();
-        urls.push(url);
+        urls.push(json.url);
+      } else {
+        setError(`Error al subir imagen: ${json.error ?? res.statusText}`);
+        setUploading(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        return;
       }
     }
 
