@@ -37,7 +37,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
       setTimeout(() => setSaved(false), 3000);
     } else {
       const json = await res.json();
-      setError(json.error ?? "Error al guardar");
+      setError(`Error: ${json.error ?? "desconocido"}${json.hint ? ` — ${json.hint}` : ""}`);
     }
   };
 

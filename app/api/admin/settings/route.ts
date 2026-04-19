@@ -27,9 +27,13 @@ export async function PATCH(req: NextRequest) {
   const supabase = getSupabaseAdmin();
 
   for (const [key, value] of Object.entries(body)) {
-    await supabase
+    const { error } = await supabase
       .from("settings")
       .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: "key" });
+
+    if (error) {
+      return NextResponse.json({ error: error.message, hint: error.hint ?? null }, { status: 500 });
+    }
   }
 
   return NextResponse.json({ ok: true });
